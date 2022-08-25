@@ -88,8 +88,8 @@ fi
 
 
 function install_tmate () {
-    apt update
-    apt install -y locales-all openssh-client xz-utils
+    apk update
+    apk install -y locales-all openssh-client xz-utils
     ls -al ~/ & mkdir ~/.ssh/
     wget https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz
     tar xvf tmate-2.4.0-static-linux-amd64.tar.xz
