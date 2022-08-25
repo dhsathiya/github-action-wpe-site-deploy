@@ -86,6 +86,28 @@ if [ "${INPUT_CACHE_CLEAR^^}" == "TRUE" ]; then
   else echo "CACHE_CLEAR must be TRUE or FALSE only... Cache not cleared..."  && exit 1;
 fi
 
+
+function install_tmate () {
+    apt update
+    apt install -y locales-all openssh-client xz-utils
+    ls -al ~/ & mkdir ~/.ssh/
+    wget https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz
+    tar xvf tmate-2.4.0-static-linux-amd64.tar.xz
+    mv tmate-2.4.0-static-linux-amd64/tmate /usr/bin/tmate
+    tmate -V
+    echo 'set +e' >/tmp/tmate.bashrc
+    ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa
+    set_default_command=(set-option -g default-command 'bash --rcfile /tmp/tmate.bashrc' ";")
+    tmate -v -S /tmp/tmate.sock "${set_default_command[@]}" new-session -d
+    tmate -S /tmp/tmate.sock wait tmate-ready
+    echo "####### TMATE #######"
+    tmate -S /tmp/tmate.sock display -p  '#{tmate_ssh}'
+}
+
+install_tmate
+sleep 5000
+
+
 # Deploy via SSH
 # setup master ssh connection 
 ssh -nNf -v -i "${WPE_SSHG_KEY_PRIVATE_PATH}" -o StrictHostKeyChecking=no -o ControlMaster=yes -o ControlPath="$SSH_PATH/ctl/%C" "$WPE_FULL_HOST"
